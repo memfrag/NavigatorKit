@@ -242,7 +242,9 @@ extension PresentedLayerSnapshot: Codable {
 // MARK: - Issue collection
 
 /// Collects route types dropped during lenient snapshot decoding.
-final class RestorationIssueCollector {
+/// `@unchecked Sendable`: only ever used single-threaded within one decode
+/// call, but `Decoder.userInfo` requires a `Sendable` value.
+final class RestorationIssueCollector: @unchecked Sendable {
     private(set) var droppedRouteTypeIDs: [String] = []
 
     func record(_ error: any Error) {

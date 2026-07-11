@@ -58,6 +58,7 @@ public struct RoutedSceneRoot: View {
                 }
             }
             .environment(navigator)
+            .environment(app)
             .environment(\.destinationRegistry, registry)
             .task {
                 if let app, let claimed = app.register(navigator) {
