@@ -16,8 +16,8 @@ public struct NavigationIntent: Sendable {
         self.operations = operations
     }
 
-    public init(@NavigationIntentBuilder _ build: () -> [NavigationOperation]) {
-        self.operations = build()
+    public init(@NavigationIntentBuilder _ build: () throws -> [NavigationOperation]) rethrows {
+        self.operations = try build()
     }
 }
 
