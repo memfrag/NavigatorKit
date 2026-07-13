@@ -279,17 +279,16 @@ func writeReviewButtonPresentsSheet() async throws {
 Most navigation tests skip the view entirely and drive the executor directly
 (as the suite above does); asserting a button is *wired* to the navigator needs
 ViewInspector or XCUITest, but the architecture keeps logic below the view so
-that's rarely necessary. A small app-side helper removes the boilerplate:
+that's rarely necessary.
+
+The package ships `Navigator.testable(...)` so the two snippets above lose their
+boilerplate:
 
 ```swift
-extension Navigator {
-    /// A headless navigator for previews and tests.
-    static func testable(root: RootLayout, registry: DestinationRegistry = DestinationRegistry()) -> Navigator {
-        Navigator(scene: SceneNavigator(root: root),
-                  executor: IntentExecutor(transitions: ImmediateTransitionCoordinator()),
-                  registry: registry)
-    }
-}
+// full control over the container shape:
+let navigator = Navigator.testable(root: .tabs(tabsLayout), registry: registry)
+// or the single-stack common case:
+let navigator = Navigator.testable(stack: ProductRoute.detail(id: 42), registry: registry)
 ```
 
 ## Example app
