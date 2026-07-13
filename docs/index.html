@@ -591,6 +591,19 @@
   <div class="wrap">
     <div class="eyebrow e-overlay">The contract</div>
     <h2>Dismissal semantics you can rely on</h2>
+    <p class="muted">Two things live under “dismissal”: explicitly closing what's open, and what
+    gets torn down when you navigate elsewhere.</p>
+
+    <h3 style="margin-top: 26px;">Closing what's open</h3>
+    <p class="muted">The navigator does it directly — no bindings to thread through your views:</p>
+    <pre class="code" aria-label="Dismissal API in Swift" style="margin-top: 4px;"><span class="ln">navigator.<span class="fn">dismiss</span>()      <span class="cm">// close the topmost sheet / cover / alert</span></span><span class="ln">navigator.<span class="fn">dismissAll</span>()   <span class="cm">// tear down every presentation, back to the base context</span></span><span class="ln">navigator.<span class="fn">pop</span>()          <span class="cm">// step back one screen in the stack</span></span><span class="ln">navigator.<span class="fn">popToRoot</span>()    <span class="cm">// … all the way to the stack root</span></span></pre>
+    <p class="muted" style="margin-top: 14px; font-size: .92rem;">Sheets also dismiss <strong>interactively</strong> —
+    a swipe-down mutates the same bound state, so the tree stays the single source of truth (unless the
+    sheet was presented with <code>interactiveDismissDisabled</code>). Inside a compound
+    <code>NavigationIntent</code> the same verbs are <code>Dismiss()</code>, <code>DismissAll()</code>,
+    <code>Pop()</code>, and <code>PopToRoot()</code>.</p>
+
+    <h3 style="margin-top: 30px;">What <span style="font-family: ui-monospace, Menlo, monospace;">navigate(to:)</span> dismisses</h3>
     <p class="muted"><code>navigate(to:placement:)</code> resolves placement as: explicit argument →
     the route type's registered default → <code>.push</code>.</p>
     <div class="tablewrap" style="margin-top: 20px;">
