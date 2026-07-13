@@ -688,6 +688,32 @@
   </div>
 </section>
 
+<section>
+  <div class="wrap">
+    <div class="eyebrow">One contract, two platforms</div>
+    <h2>There's an Android version too</h2>
+    <p class="muted">NavigatorKit ships for Jetpack Compose as well. Both packages implement the same
+      navigation contract — the same intent vocabulary, dismissal semantics, URL-pattern grammar, and
+      restoration behavior, verified by the same test matrix ported between them. What differs is only
+      what each UI toolkit demands.</p>
+    <div class="tablewrap" style="margin-top: 22px;">
+      <table>
+        <thead><tr><th></th><th>iOS · SwiftUI</th><th>Android · Compose</th></tr></thead>
+        <tbody>
+          <tr><td>Applying an intent</td><td>Staged executor: plan → apply → await each transition, because SwiftUI can't batch nested presentations</td><td>Single synchronous pass — Compose recomposes from any tree</td></tr>
+          <tr><td>Type erasure</td><td><code>AnyRoute</code> box + a <code>Codable</code> route registry</td><td>kotlinx polymorphic serialization (<code>@SerialName</code> as the stable id)</td></tr>
+          <tr><td>Interactive dismissal</td><td>Swipe-down a sheet</td><td>Swipe / scrim tap + system &amp; predictive back (<code>goBack()</code>)</td></tr>
+          <tr><td>Containers</td><td><code>NavigationStack</code> · <code>NavigationSplitView</code> · sheet · cover</td><td><code>NavDisplay</code>-style stack · list-detail pane · <code>ModalBottomSheet</code></td></tr>
+          <tr><td>Multi-window</td><td>Scenes + a scene-selection policy</td><td>On the roadmap</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: 20px;">
+      <a href="https://memfrag.github.io/NavigatorKitAndroid/" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 600; text-decoration: none; color: var(--ink); border: 1px solid var(--hair); border-radius: 999px; padding: 9px 16px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: var(--l-overlay);"></span>See the Android&nbsp;/&nbsp;Compose version →</a>
+    </p>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <span><strong>NavigatorKit</strong> — routes, staged. Ships with the ShopExample app: tabs, split view, nested sheets, deep links, multi-window, restoration.</span>
