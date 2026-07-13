@@ -219,6 +219,79 @@ try await executor.execute(myDeepLinkIntent, on: scene)
 planner staging, dismissal semantics, activation, cancellation, URL
 matching, scene policies, and restoration — no simulator required.
 
+### Previewing and testing views
+
+`Navigator` is a concrete `@Observable` `final class`, not a protocol — so
+there's nothing to mock. Views read it type-based
+(`@Environment(Navigator.self)`), and the swappable seam is one level down:
+the `TransitionCoordinator`. Swap `UITransitionCoordinator` (awaits real
+present/dismiss animations) for `ImmediateTransitionCoordinator` and you get a
+fully real navigator — real executor, planner, and dismissal semantics — that
+runs synchronously.
+
+**Previews.** `@Environment(Navigator.self)` is non-optional, so it traps if
+missing; inject a real navigator (and the registry, if the view uses
+`RouteLink` or route destinations):
+
+```swift
+#Preview("Product detail") {
+    let registry = DestinationRegistry {
+        ProductsFeature.destinations
+        ReviewsFeature.destinations
+    }
+    let navigator = Navigator(
+        scene: SceneNavigator(root: .stack(NavigationContext(root: AnyRoute(ProductRoute.detail(id: 42))))),
+        executor: IntentExecutor(transitions: ImmediateTransitionCoordinator()),
+        registry: registry
+    )
+    ProductDetailView(id: 42)
+        .environment(navigator)
+        .environment(\.destinationRegistry, registry)
+}
+```
+
+That renders the screen statically. To make navigation actually animate in the
+preview (tap a button → sheet appears), host it in a `RoutedSceneRoot` with a
+blueprint instead, so the `NavigationStack`/sheet modifiers are present.
+
+**Testing a view's actions.** Assert on the resulting state tree rather than
+recording calls — the scene is observable, so you check what actually
+happened. Use the `async throws` variants for determinism (with the immediate
+coordinator the tree is fully mutated once `await` returns):
+
+```swift
+@Test @MainActor
+func writeReviewButtonPresentsSheet() async throws {
+    let registry = DestinationRegistry { ReviewsFeature.destinations }  // registers .sheet placement
+    let scene = SceneNavigator(root: .stack(NavigationContext(root: AnyRoute(ProductRoute.detail(id: 42)))))
+    let navigator = Navigator(
+        scene: scene,
+        executor: IntentExecutor(transitions: ImmediateTransitionCoordinator()),
+        registry: registry
+    )
+
+    try await navigator.navigate(to: ReviewRoute.compose(productID: 42))  // what the button calls
+
+    #expect(scene.baseContext.sheet?.content.root == AnyRoute(ReviewRoute.compose(productID: 42)))
+}
+```
+
+Most navigation tests skip the view entirely and drive the executor directly
+(as the suite above does); asserting a button is *wired* to the navigator needs
+ViewInspector or XCUITest, but the architecture keeps logic below the view so
+that's rarely necessary. A small app-side helper removes the boilerplate:
+
+```swift
+extension Navigator {
+    /// A headless navigator for previews and tests.
+    static func testable(root: RootLayout, registry: DestinationRegistry = DestinationRegistry()) -> Navigator {
+        Navigator(scene: SceneNavigator(root: root),
+                  executor: IntentExecutor(transitions: ImmediateTransitionCoordinator()),
+                  registry: registry)
+    }
+}
+```
+
 ## Example app
 
 `Examples/ShopExample` is a workspace-free SPM app (runnable on macOS via
