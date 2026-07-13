@@ -305,7 +305,8 @@
   td:first-child code { white-space: nowrap; }
 
   /* code cards */
-  .codecard { background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .codecard { background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+  .codecard pre.code { flex: 1; }
   .codecard .cc-head { padding: 14px 20px 12px; border-bottom: 1px solid var(--hair); display: flex; align-items: baseline; gap: 10px; }
   .codecard .cc-head h3 { margin: 0; font-size: .95rem; }
   .codecard .cc-head .file { font: .72rem ui-monospace, "SF Mono", monospace; color: var(--muted); margin-left: auto; }
