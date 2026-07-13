@@ -603,6 +603,21 @@
     <code>NavigationIntent</code> the same verbs are <code>Dismiss()</code>, <code>DismissAll()</code>,
     <code>Pop()</code>, and <code>PopToRoot()</code>.</p>
 
+    <p class="muted" style="margin-top: 22px;">An intent is an ordered script over a moving cursor, so
+    teardown and navigation compose <strong>atomically</strong> — clear what's open, then go, as one
+    staged transition (ideal for a notification that should close modals and jump somewhere):</p>
+    <pre class="code" aria-label="Intent that dismisses then navigates" style="margin-top: 4px;"><span class="ln"><span class="kw">try await</span> navigator.<span class="fn">perform</span>(</span><span class="ln">  <span class="ty">NavigationIntent</span> {</span><span class="ln">    <span class="ty">DismissAll</span>()                       <span class="cm">// tear down whatever's covering the screen</span></span><span class="ln">    <span class="ty">SelectTab</span>(.shop)                    <span class="cm">// then navigate — one atomic move</span></span><span class="ln">    <span class="ty">SetStack</span>(.list, .detail(id: <span class="num">42</span>))</span><span class="ln">  }</span><span class="ln">)</span></pre>
+    <div class="card" style="margin-top: 18px; border-left: 4px solid var(--l-overlay);">
+      <h3><span style="color: var(--l-overlay);">⚠ Guardrail</span></h3>
+      <p><code>Dismiss</code> / <code>DismissAll</code> / <code>Activate</code> may <strong>not follow</strong>
+      <code>Present</code> in the same intent — the planner throws rather than guess. Those operations
+      reason about the <em>settled</em> tree (activate literally searches it), while <code>Present</code>
+      leaves the cursor on a freshly-created child that isn't attached yet. Natural order is always
+      <strong>tear down → select/set → present → push/overlay</strong>, which is how a real transition
+      physically unfolds. <code>Pop</code> is unrestricted — it's just a path mutation on the cursor's
+      context, fine even inside a sheet you presented earlier in the same intent.</p>
+    </div>
+
     <h3 style="margin-top: 30px;">What <span style="font-family: ui-monospace, Menlo, monospace;">navigate(to:)</span> dismisses</h3>
     <p class="muted"><code>navigate(to:placement:)</code> resolves placement as: explicit argument →
     the route type's registered default → <code>.push</code>.</p>
