@@ -18,7 +18,7 @@ navigator.perform(
 )
 ```
 
-**Requires iOS 26 / macOS 26, Swift 6.2.**
+**Requires iOS 18 / macOS 15, Swift 6.2.**
 
 ## Why
 
